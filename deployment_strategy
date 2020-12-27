@@ -1,0 +1,46 @@
+1. Refactor Jupyter notebooks (lstm_chopin_test.ipynb and visualize_performance.ipynb)
+    - remove all tests and plots which didn't lead to useful insights
+    - refine code to be easier to understand
+    
+2. Write Python script using Streamlit (https://www.streamlit.io/) to create a shareable web application
+    - The script will:
+        - Load the following using streamlit.cache to ensure they are only done once instead of every time
+        the user makes a change.
+            -  pre-trained keras model (.h5 file)
+            -  X_val data needed for inference and music generation
+            
+        - Also with streamlit.cache, I think I can generate the random_index variable which will be used
+        to index X_val. This will need to be constant so that if a user makes changes (like transposing 
+        the output, for instance), the 'seed' for the music generation does not also change.
+            - I would also like the new random indices to replace the current one when a user touches a 
+            button (created with streamlit.button).    
+            
+        - create a streamlit.slider object to allow the user to set the prediction threshold 
+        (pred_threshold, default 0.5).
+            - accompanying text explaining this parameter and its effect on the inference (higher
+            threshold will lower the number of keys being played at once).
+            
+        - create a streamlit.number_input object to allow the user to set the desired length of the music
+        to be generated. 
+            - The unit for this input will be the training_length (currently 16 vectors) and will need to be 
+            >= 1. Floats are okay we will simply take the floor(input_length * training_length).
+            - Accompanying text explaining this is not length in time but in number of notes or chords.
+            
+        - create a streamlit.selectbox object for the user to choose the desired key (default C-major)
+            - accompanying text explaining how the model was trained on data originally in (or transposed
+            to be in C-major) and there is no guarantee that the original output will be in C-major.
+        
+        - Use keras to generate music beginning with X_val[random_index]
+            - Create new variable random_music = X_val[random_index]
+            - For i in range(floor(input_length * training_length):   # to produce music whose length is
+                - perform inference on random_music                   # based on the user input
+                - evaluate inference using pred_threshold
+                - append on the evaluated inference
+                - popleft on random_music
+            - Transpose random_music to the user-specified key
+                
+        - Include a button for downloading the MIDI file
+        
+        - If I have time, I would like to write a Streamlit Component which allows embedding of a MIDI
+        player to play in the webapp
+        
