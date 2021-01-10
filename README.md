@@ -19,7 +19,7 @@ The model architecture and encoding largely follow the process described by this
     ├── midi_output             # Contains MIDI files generated from validation data (which is used as music generation input) or music generated from a model on such an input
     │   ├── *.mid
     ├── model_data              # Contains .csv files with training performance data (loss and metrics vs. Epochs). Saved in ./notebooks/model_training.ipynb and read-in by visualize_performance.ipynb
-    │   ├── *.mid
+    │   ├── *.csv
     ├── models                  # Contains .h5 files with trained models. Saved in ./notebooks/model_training.ipynb and best model read-in by ./web_app/ChopinBotApp.py
     │   ├── *.h5
     ├── notebooks               # Contains Jupyter notebooks. They are meant to be run/understood sequentially in the order they appear below (also alphabetical)
@@ -36,5 +36,3 @@ The model architecture and encoding largely follow the process described by this
     │   └── custom_funcs.py     # Custom functions written in keras backend language. Necessary to load a trained model file (.h5) from ../models
     └── ...
     
-
-
