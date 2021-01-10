@@ -157,7 +157,7 @@ if __name__ == '__main__':
              
     model, summary = get_model('models/best_maestro_model_2_1_512_pt4.h5')
              
-    X_val = load_validation_set('validation_data/val.npy')
+    X_val = load_validation_set('train_and_val/X_val.npy')
              
     if (st.sidebar.button('New Generation Seed')):
         generation_seed = get_seed(len(X_val), np.random.randint(1000))
