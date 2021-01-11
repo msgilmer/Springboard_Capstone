@@ -6,22 +6,27 @@ The model architecture and encoding largely follow the process described by this
       - One advantage is shorter training while still containing the same amount of musical information
       - Another is a simplification of the problem the neural network needs to solve
       - One can still transpose the generated music to any key following inference
-  2. Added custom loss function which penalizes for the error in a duration prediction (in addition to error in the prediction of notes and chords)
-      - I haved named this function the <b>Maestro Loss</b> which can be tuned with a paramter (<b>harshness</b>). A higher harshness gives more weight to the duration prediction
-      - More details in ./notebooks/model_training.ipynb
+      - The effect this has on the data is most easily understood from the following plot where the x-axis is the index of (0-87) of the piano key being played and the y-axis is the total # of times that key was played in the dataset (see ./notebooks/data_read_and_process.ipynb for the code and more details)
+![](./images/original_vs_transposed.png)
+  2. Added custom loss function which penalizes for the error in a duration prediction (in addition to error in the prediction of notes and chords via standard Binary Cross-entropy)
+      - I haved named this function the <b>Maestro Loss</b> which can be tuned with a parameter (<b>harshness</b>). A higher harshness gives more weight to the duration prediction (see ./noteooks/model_training.ipynb for the code and more details):
+![](./images/maestro_equation.jpg)
 
     .
     ├── chopin                  # Contains MIDI files downloaded from Kaggle (link above)
-    │   ├── *.mid
+    │   └── *.mid
     ├── docs                    
     │   ├── Capstone_Proposal.pdf
-    │   ├── deployment_strategy
+    │   └── deployment_strategy
+    ├── images                  # Contains the images embedded above                    
+    │   ├── maestro_equation.jpg
+    │   └── original_vs_transposed.png
     ├── midi_output             # Contains MIDI files generated from validation data (which is used as music generation input) or music generated from a model on such an input
-    │   ├── *.mid
+    │   └──  *.mid
     ├── model_data              # Contains .csv files with training performance data (loss and metrics vs. Epochs). Saved in ./notebooks/model_training.ipynb and read-in by visualize_performance.ipynb
-    │   ├── *.csv
+    │   └──  *.csv
     ├── models                  # Contains .h5 files with trained models. Saved in ./notebooks/model_training.ipynb and best model read-in by ./web_app/ChopinBotApp.py
-    │   ├── *.h5
+    │   └──  *.h5
     ├── notebooks               # Contains Jupyter notebooks. They are meant to be run/understood sequentially in the order they appear below (also alphabetical)
     │   ├── data_read_and_process.ipynb
     │   ├── model_training.ipynb
