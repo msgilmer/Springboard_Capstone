@@ -10,7 +10,10 @@ The model architecture and encoding largely follow the process described by this
 ![](./images/original_vs_transposed.png)
   2. Added custom loss function which penalizes for the error in a duration prediction (in addition to error in the prediction of notes and chords via standard Binary Cross-entropy)
       - I haved named this function the <b>Maestro Loss</b> which can be tuned with a parameter (<b>harshness</b>). A higher harshness gives more weight to the duration prediction (see ./noteooks/model_training.ipynb for the code and more details):
+
 ![](./images/maestro_equation.jpg)
+</br>
+<b>Directory Structure</b>
 
     .
     ├── chopin                  # Contains MIDI files downloaded from Kaggle (link above)
