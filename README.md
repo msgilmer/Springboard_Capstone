@@ -12,7 +12,7 @@ The model architecture and encoding largely follow the process described by this
       - I haved named this function the <b>Maestro Loss</b> which can be tuned with a parameter (<b>harshness</b>). A higher harshness gives more weight to the duration prediction (see ./noteooks/model_training.ipynb for the code and more details):
 
 ![](./images/maestro_equation.jpg)
-</br>
+</br></br>
 <b>Directory Structure</b>
 
     .
@@ -39,7 +39,7 @@ The model architecture and encoding largely follow the process described by this
     │   ├── y_train.pkl 
     │   ├── X_val.pkl 
     │   └── y_val.pkl 
-    ├── webapp                  # Contains web application code using [Streamlit](https://www.streamlit.io/). Run as 'streamlit run ChopinBotApp.py'
+    ├── webapp                  # Contains web application code using [Streamlit](https://www.streamlit.io/). Run as 'streamlit run ChopinBotApp.py' (Work in progress)
     │   ├── ChopinBotApp.py 
     │   └── custom_funcs.py     # Custom functions written in keras backend language. Necessary to load a trained model file (.h5) from ../models
     └── ...
