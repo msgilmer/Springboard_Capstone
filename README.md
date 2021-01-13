@@ -21,7 +21,8 @@ The model architecture and encoding largely follow the process described by this
     ├── docs                    
     │   ├── Capstone_Proposal.pdf
     │   └── deployment_strategy
-    ├── images                  # Contains the images embedded above                    
+    ├── images                  # Contains the images embedded above or in the web application
+    │   ├── chopin.jpg    
     │   ├── maestro_equation.jpg
     │   └── original_vs_transposed.png
     ├── midi_output             # Contains MIDI files generated from validation data (which is used as music generation input) or music generated from a model on such an input
@@ -39,8 +40,9 @@ The model architecture and encoding largely follow the process described by this
     │   ├── y_train.pkl 
     │   ├── X_val.pkl 
     │   └── y_val.pkl 
-    ├── webapp                  # Contains web application code using [Streamlit](https://www.streamlit.io/). Run as 'streamlit run ChopinBotApp.py' (Work in progress)
-    │   ├── ChopinBotApp.py 
-    │   └── custom_funcs.py     # Custom functions written in keras backend language. Necessary to load a trained model file (.h5) from ../models
+    ├── web_app                 # Contains web application code using [Streamlit](https://www.streamlit.io/). Run as 'streamlit run ChopinBotApp.py' (Work in progress)
+    │   ├── ChopinBotApp.py      
+    │   ├── custom_funcs.py     # Custom functions written in keras backend language. Necessary to load a trained model file (.h5) from ../models
+    │   └── seed_index.txt      # Streamlit runs everytime the user makes a change (caching data and function outputs (unless they need to be recomputed). In order to store a randomly generated index (which provides the seed for the music generation) we use this file. ChopinBotApp.py writes to the file when the user requests a new seed, and otherwise reads from it.
     └── ...
     
