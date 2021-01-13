@@ -7,6 +7,8 @@ import custom_funcs as cf
 
 from music21 import instrument, note, chord, tempo, duration, stream
 
+from PIL import Image
+
 # Following hash_funcs arg was needed to resolve an error:
 import tensorflow.python.keras.engine as e
 @st.cache(hash_funcs={e.sequential.Sequential: id})
@@ -33,11 +35,6 @@ def load_validation_set(filepath):
     X_val = np.load(filepath, allow_pickle = True)
     X_val[:, :, -1] *= maximum_duration    # convert back into seconds
     return X_val
-
-@st.cache()
-def get_seed(val_len, random_state = 42):
-    np.random.seed(random_state)
-    return np.random.randint(val_len)
 
 @st.cache(hash_funcs={e.sequential.Sequential: id}, \
                       allow_output_mutation = True)
@@ -107,7 +104,7 @@ def convert_to_midi(sequence, bpm = 60, output_file = '../midi_output/music.mid'
         # convert from seconds to beats
         converted_duration.quarterLength = vector[-1] * bps
         
-        if (np.sum(vector[:-1]) > 1):  # chord
+        if (np.sum(vector[:-1]) > 1):      # chord
             indices_in_chord = np.argsort(vector[:-1])[-int(np.sum(\
                 vector[:-1])):]
             notes_in_chord = [all_notes[i % len(all_notes)] + str((i // \
@@ -156,17 +153,32 @@ if __name__ == '__main__':
 
     st.title('ChopinBot 1.0: Music Generation with an Long Short-Term' \
              + ' Memory (LSTM) Neural Network')
+
+    portrait = Image.open('../images/chopin.jpg')
+
+    caption = '3D Portrait of Fr\u00E9d\u00E9ric Chopin from ' + \
+              'https://hadikarimi.com/portfolio/frederic-chopin'
+    st.image(portrait, caption = caption.encode('utf-8').decode('utf-8'), \
+             use_column_width = True)
              
-    model, summary = get_model('../models/best_maestro_model_2_1_512_0pt4_lr_5e-04_cn_1pt0.h5')
+    model, summary = get_model('../models/best_maestro_model_2_1_512_0pt4_' + \
+                               'lr_5e-04_cn_1pt0.h5')
              
     X_val = load_validation_set('../train_and_val/X_val.npy')
-             
-    if (st.sidebar.button('New Generation Seed')):
-        generation_seed = get_seed(len(X_val), np.random.randint(1000))
-    else:
-        generation_seed = get_seed(len(X_val))
 
-    st.sidebar.write('Generation Seed = {}'.format(generation_seed))
+    st.sidebar.title('Controls')
+                               
+    if (st.sidebar.button('Generate New Seed Index')):
+        # Choose randomly and write to file
+        seed_index = np.random.randint(len(X_val) - 1)
+        with open('seed_index.txt', 'w') as f:
+            f.write(str(seed_index))
+    else:
+        # Read from file
+        with open('seed_index.txt', 'r') as f:
+            seed_index = int(f.read())
+
+    st.sidebar.write('Seed Index = {}'.format(seed_index))
 
     no_of_timesteps = st.sidebar.slider('# of timesteps to predict', 1, \
                                         320, 16)
@@ -178,7 +190,7 @@ if __name__ == '__main__':
         max_value = 1.0, value = 0.5, key = 'threshold')
 
     seed_music, generated_music = generate_musical_sequence(model, \
-                        X_val[generation_seed], no_of_timesteps, threshold)
+                        X_val[seed_index], no_of_timesteps, threshold)
     
     keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     key = st.sidebar.selectbox('Choose a musical key', keys)
@@ -196,7 +208,7 @@ if __name__ == '__main__':
                         'range [20, 180]', min_value = 20, max_value = 180,\
                          value = 60, key = 'bpm') 
 
-    for music_type in ['generated', 'seed']:                                                             
+    for music_type in ['seed', 'generated']:                                                             
         if (st.button('Create MIDI File for the ' + music_type.title() + \
                       ' Music', key = music_type)):
             exec(('convert_to_midi(transposed_{0}_music, bpm = bpm, ' + \
