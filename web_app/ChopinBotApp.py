@@ -166,7 +166,7 @@ if __name__ == '__main__':
              
     X_val = load_validation_set('../train_and_val/X_val.npy')
 
-    st.sidebar.title('Controls')
+    st.sidebar.title('Controls:')
                                
     if (st.sidebar.button('Generate New Seed Index')):
         # Choose randomly and write to file
