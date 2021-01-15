@@ -35,11 +35,11 @@ The model architecture and encoding largely follow the process described by this
     │   ├── data_read_and_process.ipynb
     │   ├── model_training.ipynb
     │   └── visualize_performance.ipynb
-    ├── train_and_val           # Contains .pkl files of the training and validation partitions of the processed dataset (./notebooks/data_read_and_process.ipynb)
-    │   ├── X_train.pkl
-    │   ├── y_train.pkl 
-    │   ├── X_val.pkl 
-    │   └── y_val.pkl 
+    ├── train_and_val           # Contains .npy files (git lfs) of the training and validation partitions of the processed dataset (./notebooks/data_read_and_process.ipynb)
+    │   ├── X_train.npy
+    │   ├── y_train.npy 
+    │   ├── X_val.npy 
+    │   └── y_val.npy 
     ├── web_app                 # Contains web application code using [Streamlit](https://www.streamlit.io/). Run as 'streamlit run ChopinBotApp.py' (Work in progress)
     │   ├── ChopinBotApp.py      
     │   ├── custom_funcs.py     # Custom functions written in keras backend language. Necessary to load a trained model file (.h5) from ../models
