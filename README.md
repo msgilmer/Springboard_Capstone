@@ -31,11 +31,14 @@ The model architecture and encoding largely follow the process described by this
     │   └──  *.csv
     ├── models                  # Contains .h5 files with trained models. Saved in ./notebooks/model_training.ipynb and best model read-in by ./web_app/ChopinBotApp.py
     │   └──  *.h5
-    ├── notebooks               # Contains Jupyter notebooks. They are meant to be run/understood sequentially in the order they appear below (also alphabetical)
-    │   ├── data_read_and_process.ipynb
-    │   ├── model_training.ipynb
-    │   └── visualize_performance.ipynb
-    ├── train_and_val           # Contains .npy files (git lfs) of the training and validation partitions of the processed dataset (./notebooks/data_read_and_process.ipynb)
+    ├── notebooks               # Contains Jupyter notebooks. The commented numbers below indicate the order to read/run the notebooks for the prototype
+    │   ├── data_read_and_process.ipynb     # 1
+    │   ├── model_training.ipynb            # 2
+    │   ├── prune_model.ipynb               # Prunes a pre-trained model
+    │   ├── scaled_prototype.ipynb          # Shows that training works for a scaled dataset (via increasing window_size) (just over 1 GB)
+    │   └── visualize_performance.ipynb     # 3
+    ├── train_and_val           # Contains .npy files, but currently ignored with .gitignore because of their large file size, of the training and validation partitions of the processed dataset (./notebooks/data_read_and_process.ipynb)
+    │   ├── transposed_chopin_seqeunces.npy # Saved by ../notebooks/model_training.ipynb and loaded by ../notebooks/scaled_prototype.ipynb
     │   ├── X_train.npy
     │   ├── y_train.npy 
     │   ├── X_val.npy 
