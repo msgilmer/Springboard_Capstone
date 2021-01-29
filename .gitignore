@@ -1,1 +1,8 @@
-train_and_val/*
+train_and_val/X_train.npy
+train_and_val/y_train.npy
+train_and_val/X_val.npy
+train_and_val/y_val.npy
+train_and_val/X_train_ext.npy
+train_and_val/y_train_ext.npy
+train_and_val/X_val_ext.npy
+train_and_val/y_val_ext.npy
