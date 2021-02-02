@@ -127,18 +127,31 @@ def generate_musical_sequence(model, random_music, n_keys_piano = 88, \
     window_size = random_music.shape[0]
     original_random_music = random_music.copy()   # shallow copy
     for i in range(no_of_timesteps):
-        reshaped = random_music.reshape(1, random_music.shape[0], \
-                                            random_music.shape[1])
-        prob = model.predict(reshaped[:, -window_size:])[0]
+        try:
+            reshaped = random_music.reshape(1, random_music.shape[0], \
+                                               random_music.shape[1])
+        except ValueError as e:
+            exit_on_exception(e, 'ndarray.reshape() in ' + \
+                              'generate_musical_sequence()')
+        try:
+            prob = model.predict(reshaped[:, -window_size:])[0]
+        except ValueError as e:
+            exit_on_exception(e, 'model.predict() in ' + \
+                              'generate_musical_sequence()')
+            
         y_pred = [0 if p < threshold else 1 for p in prob[:-n_dur_nodes]] + \
                  list(np.tile([np.mean(prob[-n_dur_nodes:])], n_dur_nodes))
-        
-        if (i >= window_size):
-            random_music = np.insert(random_music, len(random_music), \
-                                     y_pred, axis = 0)
-        else:
-            random_music = np.insert(random_music, len(random_music), \
-                                     y_pred, axis = 0)[1:]
+
+        try:
+            if (i >= window_size):
+                random_music = np.insert(random_music, len(random_music), \
+                                         y_pred, axis = 0)
+            else:
+                random_music = np.insert(random_music, len(random_music), \
+                                         y_pred, axis = 0)[1:]
+        except ValueError as e:
+            exit_on_exception(e, 'np.insert() in ' + \
+                              'generate_musical_sequence()')
             
     # Need just one duration now that we're done with inference
     return original_random_music[:, :-n_dur_nodes + 1], \
@@ -154,10 +167,19 @@ def transpose_sequence(sequence, transposition = 0):
         return sequence
     shift = transposition
     sequence, durations = sequence[:, :-1], sequence[:, -1]
-    for i in range(len(sequence)):
-        sequence[i] = np.concatenate((sequence[i][shift:], \
-                                      sequence[i][:shift]))
-    return np.insert(sequence, len(sequence[0]), durations, axis = 1)
+    
+    try:
+        for i in range(len(sequence)):
+            sequence[i] = np.concatenate((sequence[i][shift:], \
+                                          sequence[i][:shift]))
+    except ValueError as e:
+        exit_on_exception(e, 'np.concatenate() in ' + 'transpose_sequence()')
+
+    try:
+        return np.insert(sequence, len(sequence[0]), durations, axis = 1)
+    except (IndexError, ValueError) as e:
+        exit_on_exception(e, 'np.insert() in ' + 'transpose_sequence()')
+
 
 @st.cache()
 def piano_idx_to_note(index):
@@ -222,8 +244,13 @@ def convert_to_midi(sequence, bpm = 60, output_file = '../midi_output/music.mid'
 from os import path
 from base64 import b64encode
 def get_binary_file_downloader_html(bin_file, file_label='File'):
-    with open(bin_file, 'rb') as f:
-        data = f.read()
+
+    try:
+        with open(bin_file, 'rb') as f:
+            data = f.read()
+    except FileNotFoundError as e:
+        exit_on_exception(e, 'open() in ' + 'get_binary_file_downloader_html()')
+        
     bin_str = b64encode(data).decode()
     href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{path.basename(bin_file)}">Download {file_label}</a>'
     return href
@@ -249,16 +276,21 @@ if __name__ == '__main__':
     portrait = Image.open('../images/chopin.jpg')
 
     caption = '3D Portrait of Fr\u00E9d\u00E9ric Chopin from ' + \
-              'https://hadikarimi.com/portfolio/frederic-chopin'
-    st.image(portrait, caption = caption.encode('utf-8').decode('utf-8'), \
-             use_column_width = True)
+              '[here](https://hadikarimi.com/portfolio/frederic-chopin)'
+
+    st.image(portrait, use_column_width = True)
+    tabs = '&emsp;' * 48
+    st.markdown(tabs + caption.encode('utf-8').decode('utf-8'))
 
     precision_and_recall = Image.open('../images/precision_and_recall.jpg')
-    caption = 'The precision and recall can be adjusted by changing the ' + \
-              'probability threshold. Lowering the threshold will increase ' + \
-              'the number of notes but comes at the cost of more "wrong" ' + \
-              'notes. The f-measure is the harmonic mean of the two.'
-    st.image(precision_and_recall, caption = caption, use_column_width = True)
+    caption = 'The [precision and recall](https://en.wikipedia.org/wiki/Preci'+\
+              'sion_and_recall) can be adjusted by changing the probability t'+\
+              'hreshold. Lowering the threshold will increase the number of n'+\
+              'otes but comes at the cost of predicting more "wrong" notes. T'+\
+              'he f-measure is the [harmonic mean](https://en.wikipedia.org/w'+\
+              'iki/Harmonic_mean) of the two.'
+    st.image(precision_and_recall, use_column_width = True)
+    st.markdown(caption)
     
     st.sidebar.title('Controls:')
 
@@ -286,12 +318,16 @@ if __name__ == '__main__':
         'Set probability threshold in range (0, 1)', min_value = 0.0, \
         max_value = 1.0, value = 0.5, key = 'threshold')
 
+  #  st.sidebar.write('threshold = {}'.format(threshold))
+
     seed_music, generated_music = generate_musical_sequence(model, \
                                   X_val[seed_index], no_of_timesteps = \
                                   no_of_timesteps, threshold = threshold)
     
     keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     key = st.sidebar.selectbox('Choose a musical key', keys)
+
+ #   st.sidebar.write('key = {}'.format(key))
 
     if (key == 'C'):
         transposition = 0
@@ -304,7 +340,9 @@ if __name__ == '__main__':
 
     bpm = st.sidebar.number_input('Set the bpm (beats per minute) in the '\
                         'range [20, 180]', min_value = 20, max_value = 180,\
-                         value = 60, key = 'bpm') 
+                         value = 60, key = 'bpm')
+
+ #  st.sidebar.write('bpm = {}'.format(bpm))
 
     for music_type in ['seed', 'generated']:                                                             
         if (st.button('Create MIDI File for the ' + music_type.title() + \

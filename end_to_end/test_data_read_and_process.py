@@ -1,4 +1,5 @@
 import data_read_and_process as drap
+import numpy as np
 
 def test_note_to_piano_idx():
 
@@ -57,4 +58,34 @@ def test_note_to_piano_idx():
                 composite = letter + addon + octave
                 assert(drap.note_to_piano_idx(composite) == -1)
 
+def test_transpose_sequence(n_keys_piano = 88):
+
+    n_tests = 5
+    n_sequences = 5
+    for i in range(n_tests):
+        transposition = np.random.randint(0, 12) # random amount to transpose by
+        test_sequence = []
+        correct_result = []
+        for j in range(n_sequences):
+            random_size = np.random.randint(0, n_keys_piano)
+            random_indices = np.random.choice(n_keys_piano, \
+                                            size = random_size, replace = False)
+            vector = np.zeros(n_keys_piano)
+            np.put(vector, random_indices, 1)
+            test_sequence.append(vector)
+            transposed_indices = []
+            for index in random_indices:
+                transposed_index = index + transposition
+                if (transposed_index >= n_keys_piano):
+                    transposed_index -= n_keys_piano
+                transposed_indices.append(transposed_index)
+            vector = np.zeros(n_keys_piano)
+            np.put(vector, transposed_indices, 1)
+            correct_result.append(vector)
+
+        result = drap.transpose_sequence(test_sequence, transposition)
+        for j in range(n_sequences):
+            assert((result[j] == correct_result[j]).all())
+    
+        
     

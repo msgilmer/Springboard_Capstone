@@ -6,3 +6,5 @@ train_and_val/X_train_ext.npy
 train_and_val/y_train_ext.npy
 train_and_val/X_val_ext.npy
 train_and_val/y_val_ext.npy
+models/best_maestro_model_ext20_2_1_1024_0pt4_mnv_2.h5
+models/best_pruned_maestro_model_ext20_2_1_1024_0pt4_mnv_2_0pt5_0pt8.h5

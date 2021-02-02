@@ -284,7 +284,7 @@ def songs_to_sequences(songs, time_tol = 1.e-3, n_keys_piano = 88):
     return np.array(sequences)
 
 def transpose_sequence(note_sequence, transposition):
-    """ Perform a right-shift on the keys' part of the vectors Effectively, this
+    """Perform a right-shift on the keys part of the vectors. Effectively, this
     outputs a new sequence repesenting a song but transposed. The size of the
     shift is transposition."""
     
@@ -303,7 +303,7 @@ def transpose_sequences(sequences, keys_by_song):
     
     # relative offsets from C in the right-dir
     right_offset = {'C': 0, 'D': 10, 'E': 8, 'F': 7, 'G': 5, 'A': 3, 'B': 1}
-    
+
     transposed_sequences = [] 
     for i in range(len(sequences)):
         notes, durations = sequences[i][:, :-1], sequences[i][:, -1]
