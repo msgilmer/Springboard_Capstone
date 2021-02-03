@@ -64,6 +64,7 @@ The model architecture and encoding largely follow the process described by this
     │   │   └── logzero*log
     │   ├── rndm_seed_index_files     # txt files that uniquely store the last randomly-generated seed index (for the X_val set) for each unique session.
     │   │   └── rndm*txt
-    │   └── precision_and_recall.py   # script to generate a plot 9../images/precision_and_recall.jpg) for embedding into the application
+    │   ├── precision_and_recall.py   # script to generate a plot 9../images/precision_and_recall.jpg) for embedding into the application
+    │   └── requirements.txt          # generated with pipreqs
     └── ...
     
