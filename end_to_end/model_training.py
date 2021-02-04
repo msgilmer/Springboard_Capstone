@@ -123,8 +123,42 @@ def maestro_dur_loss_wr(harshness, n_dur_nodes):
                   K.mean(ypred[:, -n_dur_nodes:], axis = 1) + K.epsilon())))
     return maestro_dur_loss
 
+def get_optimizer(lr, clipnorm, clipvalue):
+    """Return the RMSprop optimizer with the above parameters"""
+
+    if (lr or clipnorm or clipvalue):
+        if (lr):          # It's required that the first argument to RMSprop is
+                          # not None
+            return RMSprop(lr = lr, clipnorm = clipnorm, clipvalue = clipvalue)
+        elif (clipnorm):
+            return RMSprop(clipnorm = clipnorm, clipvalue = clipvalue)
+        else: # clipvalue
+            return RMSprop(clipvalue = clipvalue)
+    return RMSprop()   # TypeError when all are None, so do this instead
+
+def get_filename(n_dur_nodes, n_lstm_layers, n_dense_layers, n_lstm_nodes, \
+                 dropout_rate, base_nm = 'best_maestro_model_ext_e2e', \
+                 max_norm_value = None, lr = None, clipnorm = None,
+                 clipvalue = None):
+    """Get the filename to save the best model to based on the passed
+    parameters."""
+
+    filename = 'best_maestro_model_ext{0}_e2e_{1}_{2}_{3}_{4}'\
+               .format(n_dur_nodes, n_lstm_layers, n_dense_layers, \
+               n_lstm_nodes, str(dropout_rate).replace('.', 'pt'))
+    if (max_norm_value):
+        filename += '_mnv_{}'.format(Decimal(max_norm_value))
+    if (lr):
+        filename += '_lr_{}'.format('%.0e' % Decimal(lr))
+    if (clipnorm):
+        filename += '_cn_{}'.format(str(clipnorm).replace('.', 'pt'))     
+    if (clipvalue):
+        filename += '_cv_{}'.format(str(clipvalue).replace('.', 'pt'))
+
+    return filename
+
 def generate_cols_dict(history):
-    """return a mapping of desired column names to the corresponding columns in
+    """Return a mapping of desired column names to the corresponding columns in
     the history dictionary (previously history.history where history is the
     return value of model.train)"""
     return {'maestro_loss': history['loss'], 'f1_score': \
@@ -136,6 +170,26 @@ def generate_cols_dict(history):
             'val_recall': history['val_recall_mod'], 'val_dur_error': \
             history['val_dur_error'], 'val_dur_loss': \
             history['val_maestro_dur_loss']}
+
+def save_performance_data(history, filename, path = \
+                          '../model_data/performance_data/'):
+    """Save the performance data stored in the history dictionary (previously
+    history.history where history is the return value of model.train) to a csv
+    file."""
+    
+    # In all preliminary tests model training has failed at some point when the
+    # loss becomes NaN
+    if (len(history['val_loss']) < len(history['loss'])):
+        # a NaN during training
+        for key, value in history.items():
+            # pd.DataFrame requires value lengths to be equal:
+            if (key[:3] == 'val'):      
+                value.append(np.nan)
+                
+    df = pd.DataFrame(generate_cols_dict(history))
+    df.index.name = 'Epochs'
+    df.to_csv(path + filename + '.csv')
+
 
 def train_lstm_model(X_train, X_val, y_train, y_val, n_dur_nodes = 20, \
                      n_lstm_layers = 2, n_dense_layers = 1, n_lstm_nodes = 512,\
@@ -151,34 +205,18 @@ def train_lstm_model(X_train, X_val, y_train, y_val, n_dur_nodes = 20, \
                  n_dense_layers, n_lstm_nodes = n_lstm_nodes, dropout_rate = \
                  dropout_rate, max_norm_value = max_norm_value)
 
-    if (lr or clipnorm or clipvalue):
-        if (lr):          # It's required that the first argument to RMSprop is
-                          # not None
-            opt = RMSprop(lr = lr, clipnorm = clipnorm, clipvalue = clipvalue)
-        elif (clipnorm):
-            opt = RMSprop(clipnorm = clipnorm, clipvalue = clipvalue)
-        else: # clipvalue
-            opt = RMSprop(clipvalue = clipvalue)
-    else:
-        opt = RMSprop()   # TypeError when all are None, so do this instead
+    opt = get_optimizer(lr, clipnorm, clipvalue)
         
     model.compile(loss = maestro_loss_wr(harshness, n_dur_nodes), optimizer = \
                   opt, metrics = [f1_score_mod_wr(n_dur_nodes), \
                   recall_mod_wr(n_dur_nodes), precision_mod_wr(n_dur_nodes), \
                   dur_error_wr(n_dur_nodes), maestro_dur_loss_wr(harshness, \
                                                                  n_dur_nodes)])
-    
-    filename = 'best_maestro_model_ext_e2e_{0}_{1}_{2}_{3}_{4}'\
-               .format(n_dur_nodes, n_lstm_layers, n_dense_layers, \
-               n_lstm_nodes, str(dropout_rate).replace('.', 'pt'))
-    if (max_norm_value):
-        filename += '_mnv_{}'.format(Decimal(max_norm_value))
-    if (lr):
-        filename += '_lr_{}'.format('%.0e' % Decimal(lr))
-    if (clipnorm):
-        filename += '_cn_{}'.format(str(clipnorm).replace('.', 'pt'))     
-    if (clipvalue):
-        filename += '_cv_{}'.format(str(clipvalue).replace('.', 'pt'))
+
+    filename = get_filename(n_dur_nodes, n_lstm_layers, n_dense_layers, \
+                            n_lstm_nodes, dropout_rate, \
+                            max_norm_value = max_norm_value, lr = lr, \
+                            clipnorm = clipnorm, clipvalue = clipvalue)
                                    
     mc = ModelCheckpoint('../models/' + filename + '.h5', monitor = 'val_loss',\
                          mode = 'min', save_best_only = True, verbose = 1)
@@ -186,17 +224,5 @@ def train_lstm_model(X_train, X_val, y_train, y_val, n_dur_nodes = 20, \
     history = model.fit(X_train, y_train, batch_size = batch_size, epochs = \
                         epochs, validation_data = (X_val, y_val), verbose = 2, \
                         callbacks = [mc, TerminateOnNaN()])
-    
-    # In most preliminary tests model training has failed at some point when the
-    # loss becomes NaN
-    if (len(history.history['val_loss']) < len(history.history['loss'])):
-        # a NaN during training
-        for key, value in history.history.items():
-            # pd.DataFrame requires value lengths to be equal:
-            if (key[:3] == 'val'):      
-                value.append(np.nan)
-                
-    df = pd.DataFrame(generate_cols_dict(history.history))
-    df.index.name = 'Epochs'
-    df.to_csv('../model_data/performance_data/' + filename + '.csv')
 
+    save_performance_data(history.history, filename)

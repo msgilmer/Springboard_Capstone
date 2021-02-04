@@ -319,7 +319,7 @@ def transpose_sequences(sequences, keys_by_song):
                 return
         transposed_sequence = transpose_sequence(notes, transposition)
         transposed_sequences.append(np.insert(transposed_sequence,\
-                                    n_keys_piano, durations, axis = 1))   
+                            len(transposed_sequence[0]), durations, axis = 1))   
     return transposed_sequences
 
 def sequences_to_inputs(sequences, window_size = 16):

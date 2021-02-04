@@ -87,5 +87,3 @@ def test_transpose_sequence(n_keys_piano = 88):
         for j in range(n_sequences):
             assert((result[j] == correct_result[j]).all())
     
-        
-    
