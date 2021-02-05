@@ -11,6 +11,8 @@ The model architecture and encoding largely follow the process described by this
   2. Added custom loss function which penalizes for the error in a duration prediction (in addition to error in the prediction of notes and chords via standard Binary Cross-entropy)
       - I haved named this function the <b>Maestro Loss</b> which can be tuned with a parameter (<b>harshness</b>). A higher harshness gives more weight to the duration prediction (see ./noteooks/model_training.ipynb for the code and more details):
 
+Part of this project is a web application which I have given its own [repository](https://github.com/msgilmer/ChopinBotApp). Many of the files from this repository, which are needed by the application, have been copied over.
+
 ![](./images/maestro_equation.jpg)
 </br></br>
 <b>Directory Structure</b>
@@ -58,13 +60,5 @@ The model architecture and encoding largely follow the process described by this
     │   ├── y_val_ext.npy
     │   ├── X_val_ext_1.npy        # Not in .gitignore. We use X_val sequences as input into the music generation in ../web_app. This set is broken into two to avoid Git LFS.
     │   └── X_val_ext_2.npy        # Not in .gitignore
-    ├── web_app                 # Contains web application code using [Streamlit](https://www.streamlit.io/). Run as 'streamlit run ChopinBotApp.py' (Work in progress)
-    │   ├── ChopinBotApp.py
-    │   ├── logfiles                  # logfiles for each unique session. Used for monitoring errors
-    │   │   └── logzero*log
-    │   ├── rndm_seed_index_files     # txt files that uniquely store the last randomly-generated seed index (for the X_val set) for each unique session.
-    │   │   └── rndm*txt
-    │   ├── precision_and_recall.py   # script to generate a plot 9../images/precision_and_recall.jpg) for embedding into the application
-    │   └── requirements.txt          # generated with pipreqs
     └── ...
     
