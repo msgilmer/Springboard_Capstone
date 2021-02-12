@@ -1,0 +1,2 @@
+Epochs,maestro_loss,f1_score,precision,recall,dur_error,dur_loss,val_maestro_loss,val_f1_score,val_precision,val_recall,val_dur_error,val_dur_loss
+0,,,,,,,,,,,,
