@@ -28,7 +28,8 @@ Part of this project is a web application which I have given its own [repository
     │   ├── chopin.jpg    
     │   ├── maestro_equation.jpg
     │   ├── original_vs_transposed.png
-    │   └── precision_and_recall.jpg
+    │   ├── precision_and_recall.jpg
+    │   └── precision_and_recall.py    # Script that reads in the best model, makes predictions and produces the jpg file of the same base name.
     ├── midi_output             # Contains MIDI files generated from validation data (which is used as music generation input) or music generated from a model on such an input
     │   └──  *.mid
     ├── model_data              # Contains .csv saved in ./notebooks/model_training.ipynb and ./notebooks/model_training_v2.ipynb (v2)
@@ -38,7 +39,7 @@ Part of this project is a web application which I have given its own [repository
     │   │   └── best_maestro_model*.csv
     │   ├── weight_data         # Statistics on the weights of the network over epochs
     │   │   └── weight*.csv     
-    ├── models                  # Contains .h5 files with trained models. Saved in ./notebooks/model_training.ipynb (and v2) and best model read-in by ./web_app/ChopinBotApp.py
+    ├── models                  # Contains .h5 files with trained models. Saved by ./notebooks/model_training*ipynb. Most of files have been since deleted for space reasons, but their performances are still logged in ./model_data/performance_data.
     │   └──  *.h5
     ├── notebooks               # Contains Jupyter notebooks. The commented numbers below indicate the order to read/run the notebooks for the prototype
     │   ├── data_read_and_process.ipynb     # Parse Midi files and prepare data for network input
